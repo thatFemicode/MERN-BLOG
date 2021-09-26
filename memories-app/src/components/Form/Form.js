@@ -1,11 +1,16 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useStyles from "./styles";
 import { TextField, Button, Typography, Paper } from "@material-ui/core";
 import FileBase from "react-file-base64";
-import { useDispatch } from "react-redux";
-import { createPost } from "../../actions/post";
-const Form = () => {
+import { useDispatch, useSelector } from "react-redux";
+import { createPost, updatePost } from "../../actions/post";
+const Form = ({ currentId, setCurrentId }) => {
+  // 2nd thing done on this after branch has been pushed to master
+  // We only want the data from a post, the updated post so we do the below
+  const post = useSelector((state) =>
+    currentId ? state.posts.find((post) => post._id === currentId) : null
+  );
   const dispatch = useDispatch();
   const [postData, setPostData] = useState({
     creator: "",
@@ -14,13 +19,31 @@ const Form = () => {
     tags: "",
     selectedFile: "",
   });
-  console.log(postData);
+  // console.log(postData);
+  useEffect(() => {
+    if (post) setPostData(post);
+  }, [post]);
   const classes = useStyles();
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(createPost(postData));
+    // 1st thing done on this after branch has been pushed to master
+    if (currentId) {
+      dispatch(updatePost(currentId, postData));
+    } else {
+      dispatch(createPost(postData));
+    }
+    clear();
   };
-  const clear = () => {};
+  const clear = () => {
+    setCurrentId(null);
+    setPostData({
+      creator: "",
+      title: "",
+      message: "",
+      tags: "",
+      selectedFile: "",
+    });
+  };
   return (
     <Paper className={classes.paper}>
       <form
@@ -29,7 +52,9 @@ const Form = () => {
         className={`${classes.root} ${classes.form}`}
         onSubmit={handleSubmit}
       >
-        <Typography variant="h6">Creating a Memory</Typography>
+        <Typography variant="h6">
+          {currentId ? "Editing" : "Creating"} A Memory
+        </Typography>
         <TextField
           name="creator"
           variant="outlined"
@@ -64,7 +89,9 @@ const Form = () => {
           label="tags"
           fullWidth
           value={postData.tags}
-          onChange={(e) => setPostData({ ...postData, tags: e.target.value })}
+          onChange={(e) =>
+            setPostData({ ...postData, tags: e.target.value.split(",") })
+          }
         />
         <div className={classes.fileInput}>
           <FileBase

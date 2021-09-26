@@ -1,6 +1,6 @@
 import logo from "./logo.svg";
 import React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { useDispatch } from "react-redux";
 import { getPosts } from "./actions/post";
@@ -11,13 +11,18 @@ import Posts from "./components/Posts/Posts";
 import useStyles from "./styles";
 // wE HAVE TO DISPATCH OUR GET POSTS ACTION TO APP.JS USING USE DISPATCH
 
+// (1)
+// first thing done on this file after it has been pushed to master
+// is finding a way to keep track of the current id(state) for the edit
+// So we will be using the useState first before changint it to redux
 function App() {
+  const [currentId, setCurrentId] = useState(null);
   const classes = useStyles();
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getPosts());
-  }, [dispatch]);
+  }, [dispatch, currentId]);
   console.log(classes);
   return (
     <Container maxWidth="lg">
@@ -41,10 +46,10 @@ function App() {
             spacing={3}
           >
             <Grid item xs={12} sm={7}>
-              <Posts />
+              <Posts setCurrentId={setCurrentId} />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <Form />
+              <Form currentId={currentId} setCurrentId={setCurrentId} />
             </Grid>
           </Grid>
         </Container>
