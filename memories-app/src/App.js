@@ -1,6 +1,7 @@
 import logo from "./logo.svg";
 import React from "react";
 import { useEffect, useState } from "react";
+import { BrowserRouter, Router, Switch, Route } from "react-router-dom";
 import "./App.css";
 import { useDispatch } from "react-redux";
 import { getPosts } from "./actions/post";
@@ -9,6 +10,9 @@ import memories from "./images/memories.png";
 import Form from "./components/Form/Form";
 import Posts from "./components/Posts/Posts";
 import useStyles from "./styles";
+import Navbar from "./components/Navbar/Navbar";
+import Home from "./components/Home/Home";
+import Auth from "./components/Auth/Auth";
 // wE HAVE TO DISPATCH OUR GET POSTS ACTION TO APP.JS USING USE DISPATCH
 
 // (1)
@@ -16,45 +20,16 @@ import useStyles from "./styles";
 // is finding a way to keep track of the current id(state) for the edit
 // So we will be using the useState first before changint it to redux
 function App() {
-  const [currentId, setCurrentId] = useState(null);
-  const classes = useStyles();
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getPosts());
-  }, [dispatch, currentId]);
-  console.log(classes);
   return (
-    <Container maxWidth="lg">
-      <AppBar className={classes.appBar} position="static" color="inherit">
-        <Typography className={classes.heading} variant="h2" align="center">
-          Memories
-        </Typography>
-        <img
-          className={classes.image}
-          src={memories}
-          alt="memories"
-          height="60"
-        />
-      </AppBar>
-      <Grow in>
-        <Container>
-          <Grid
-            container
-            justify="space-between"
-            alignItems="stretch"
-            spacing={3}
-          >
-            <Grid item xs={12} sm={7}>
-              <Posts setCurrentId={setCurrentId} />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Form currentId={currentId} setCurrentId={setCurrentId} />
-            </Grid>
-          </Grid>
-        </Container>
-      </Grow>
-    </Container>
+    <BrowserRouter>
+      <Container maxWidth="lg">
+        <Navbar />
+        <Switch>
+          <Route path="/" exact component={Home} />
+          <Route path="/auth" exact component={Auth} />
+        </Switch>
+      </Container>
+    </BrowserRouter>
   );
 }
 

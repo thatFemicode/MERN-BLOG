@@ -12,7 +12,13 @@ const getPosts = async (req, res) => {
 };
 const createPost = async (req, res) => {
   const post = req.body;
-  const newPost = new PostMessage(post);
+  // nOW OUR CREATOR WONT BE THE NAME THAT WE SPECIFIED,
+  // IT WILL BE THE ID
+  const newPost = new PostMessage({
+    ...post,
+    creator: req.userId,
+    createdAt: new Date().toISOString(),
+  });
   try {
     await newPost.save();
     res.status(201).json(newPost);
@@ -52,17 +58,28 @@ const deletePost = async (req, res) => {
   res.json({ message: 'Successfully deleted' });
 };
 const likePost = async (req, res) => {
+  // The req.id property is coming from the auth middleware becuase now
+  // The auth middleware gets executed and we can then get properties from it
   const { id } = req.params;
+
+  if (!req.userId) return res.json({ message: 'Unauthorized' });
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(404).send('No Post Found with that ID');
   const post = await PostMessage.findById(id);
-  const updatedPost = await PostMessage.findByIdAndUpdate(
-    id,
-    {
-      likeCount: post.likeCount + 1,
-    },
-    { new: true }
-  );
+  // We have the post above so we have to see if the user ID is already
+  // In the like section
+  // We have a callback functionwhere we loop through all likes
+  const index = post.likes.findIndex((id) => id === String(req.userId));
+  if (index === -1) {
+    // Like the post
+    post.likes.push(req.useeId);
+  } else {
+    // Dislike a post
+    post.likes = post.likes.filter((id) => id !== String(req.userId));
+  }
+  const updatedPost = await PostMessage.findByIdAndUpdate(id, post, {
+    new: true,
+  });
   res.json(updatedPost);
 };
 module.exports = { getPosts, createPost, updatePost, deletePost, likePost };

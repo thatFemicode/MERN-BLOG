@@ -11,9 +11,9 @@ const Form = ({ currentId, setCurrentId }) => {
   const post = useSelector((state) =>
     currentId ? state.posts.find((post) => post._id === currentId) : null
   );
+  const user = JSON.parse(localStorage.getItem("profi"));
   const dispatch = useDispatch();
   const [postData, setPostData] = useState({
-    creator: "",
     title: "",
     message: "",
     tags: "",
@@ -28,16 +28,27 @@ const Form = ({ currentId, setCurrentId }) => {
     e.preventDefault();
     // 1st thing done on this after branch has been pushed to master
     if (currentId) {
-      dispatch(updatePost(currentId, postData));
+      dispatch(updatePost(currentId, { postData, name: user?.result.name }));
     } else {
-      dispatch(createPost(postData));
+      dispatch(createPost({ ...postData, name: user?.result.name }));
+      // note from the above user will be gotten from local torage
     }
     clear();
   };
+
+  // Check if there are no current logged in users you cannot creatwe a post right now
+  if (!user?.result?.name) {
+    return (
+      <Paper className={classes.paper}>
+        <Typography variant="h6" align="center">
+          Please Signin to crete your own memories and like your others memories
+        </Typography>
+      </Paper>
+    );
+  }
   const clear = () => {
     setCurrentId(null);
     setPostData({
-      creator: "",
       title: "",
       message: "",
       tags: "",
@@ -55,16 +66,6 @@ const Form = ({ currentId, setCurrentId }) => {
         <Typography variant="h6">
           {currentId ? "Editing" : "Creating"} A Memory
         </Typography>
-        <TextField
-          name="creator"
-          variant="outlined"
-          label="Creator"
-          fullWidth
-          value={postData.creator}
-          onChange={(e) =>
-            setPostData({ ...postData, creator: e.target.value })
-          }
-        />
         <TextField
           name="title"
           variant="outlined"

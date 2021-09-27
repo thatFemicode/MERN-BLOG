@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const postRoutes = require('./routes/posts');
+const usersRoutes = require('./routes/users');
 
 const app = express();
 dotenv.config();
@@ -14,7 +15,7 @@ app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }));
 app.use(cors());
 
 app.use('/posts', postRoutes);
-
+app.use('/user', usersRoutes);
 app.get('/', (req, res) => {
   res.send('Hello to Memories Api');
 });
