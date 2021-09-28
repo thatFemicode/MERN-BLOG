@@ -10,6 +10,27 @@ const getPosts = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+const getPostsBySearch = async (req, res) => {
+  // getting the data from the query
+  const { searchQuery, tags } = req.query;
+
+  try {
+    // title must  be converted into regular expression upper case or lower case
+    const title = new RegExp(searchQuery, 'i');
+    const post = await PostMessage.find({
+      // the $gin melow means either find title or tags
+      // Alse remember there is an array of tags
+      // the $in below is checking the lsit of tags contained in the database
+      $or: [{ title }, { tags: { $in: tags.split(',') } }],
+    });
+
+    res.json({ data: post });
+    // console.log(postMessages);
+    // console.log(postMessages);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
 const createPost = async (req, res) => {
   const post = req.body;
   // nOW OUR CREATOR WONT BE THE NAME THAT WE SPECIFIED,
@@ -82,4 +103,11 @@ const likePost = async (req, res) => {
   });
   res.json(updatedPost);
 };
-module.exports = { getPosts, createPost, updatePost, deletePost, likePost };
+module.exports = {
+  getPosts,
+  getPostsBySearch,
+  createPost,
+  updatePost,
+  deletePost,
+  likePost,
+};

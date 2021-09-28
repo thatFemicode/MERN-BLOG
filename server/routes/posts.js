@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
   getPosts,
+  getPostsBySearch,
   createPost,
   updatePost,
   deletePost,
@@ -9,6 +10,7 @@ const {
 } = require('../controllers/posts');
 const { auth } = require('../middleware/auth');
 router.get('/', getPosts);
+router.get('/search', getPostsBySearch);
 router.post('/', auth, createPost);
 router.patch('/:id', auth, updatePost);
 router.delete('/:id', auth, deletePost);
