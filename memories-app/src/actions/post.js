@@ -5,6 +5,7 @@ import {
   UPDATE,
   DELETE,
   LIKE,
+  FETCH_BY_SEARCH,
 } from "../constants/actionTypes";
 // Now we have to create actions
 // actiona cretors are functions that return actions
@@ -13,6 +14,23 @@ export const getPosts = () => async (dispatch) => {
   try {
     const { data } = await api.fetchPosts();
     dispatch({ type: FETCH_ALL, payload: data });
+  } catch (error) {
+    console.log(error);
+  }
+};
+// This is for the search for both tags and norma search
+// The get post by search will accept a searhcQuery and that will be sent to
+// the database with out request
+export const getPostsBySearch = (searchQuery) => async (dispatch) => {
+  try {
+    // Making the request, we have to destructure the {data} becuase we
+    // are sending back something called data from the backend
+    const {
+      data: { data },
+    } = await api.fetchPostsBySearch(searchQuery);
+    console.log(data);
+    dispatch({ type: FETCH_BY_SEARCH, payload: data });
+    // dispatch({ type: FETCH_ALL, payload: data });
   } catch (error) {
     console.log(error);
   }

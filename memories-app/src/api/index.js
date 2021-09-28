@@ -19,6 +19,12 @@ API.interceptors.request.use((req) => {
 });
 // All actions towrd backend are going to be done with redux
 export const fetchPosts = () => API.get("/posts");
+export const fetchPostsBySearch = (searchQuery) =>
+  API.get(
+    `/posts/search?searchQuery=${searchQuery.search || "none"}&tags=${
+      searchQuery.tags
+    }`
+  );
 
 // On bigger applications redux will be great for scalability
 
