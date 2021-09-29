@@ -1,11 +1,31 @@
 const PostMessage = require('../models/postmessage');
 const mongoose = require('mongoose');
 const getPosts = async (req, res) => {
+  const { page } = req.query;
   try {
-    const postMessages = await PostMessage.find();
+    // nUMBER OF POSTS PER STAGE(8
+    const limit = 1;
+    // const startIndex which is the startindex of a post on a
+    // specific page
+    const startIndex = (Number(page) - 1) * limit;
+    // the count document is to count the document in the database
+    const total = await PostMessage.countDocuments({});
+    // Getting the post from the newest to the oldest using the id and also giving a limit
+    const posts = await PostMessage.find()
+      .sort({ _id: -1 })
+      .limit(limit)
+      .skip(startIndex);
     // console.log(postMessages);
     // console.log(postMessages);
-    res.status(200).json(postMessages);
+    // for  this to make sense to the FE we have to pass a bit more data than post
+    // data: posts
+    // currentPage: Number of the page
+    // numberOf Pages: GIVES THT TOTAL NUMBER OF PAGES
+    res.json({
+      data: posts,
+      currentPage: Number(page),
+      numberOfPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     res.status(404).json({ message: error.message });
   }
@@ -19,7 +39,7 @@ const getPostsBySearch = async (req, res) => {
     const title = new RegExp(searchQuery, 'i');
     const post = await PostMessage.find({
       // the $gin melow means either find title or tags
-      // Alse remember there is an array of tags
+      // Also remember there is an array of tags
       // the $in below is checking the lsit of tags contained in the database
       $or: [{ title }, { tags: { $in: tags.split(',') } }],
     });
@@ -31,6 +51,18 @@ const getPostsBySearch = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+const getPost = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const post = await PostMessage.findById(id);
+
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
 const createPost = async (req, res) => {
   const post = req.body;
   // nOW OUR CREATOR WONT BE THE NAME THAT WE SPECIFIED,
@@ -93,7 +125,7 @@ const likePost = async (req, res) => {
   const index = post.likes.findIndex((id) => id === String(req.userId));
   if (index === -1) {
     // Like the post
-    post.likes.push(req.useeId);
+    post.likes.push(req.userId);
   } else {
     // Dislike a post
     post.likes = post.likes.filter((id) => id !== String(req.userId));
@@ -110,4 +142,5 @@ module.exports = {
   updatePost,
   deletePost,
   likePost,
+  getPost,
 };

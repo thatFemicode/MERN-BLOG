@@ -6,14 +6,36 @@ import {
   DELETE,
   LIKE,
   FETCH_BY_SEARCH,
+  START_LOADING,
+  END_LOADING,
+  FETCH_POST,
 } from "../constants/actionTypes";
 // Now we have to create actions
 // actiona cretors are functions that return actions
 // The below is a function that returns another function
-export const getPosts = () => async (dispatch) => {
+export const getPosts = (page) => async (dispatch) => {
   try {
-    const { data } = await api.fetchPosts();
+    // DISPATCH START LOADING IMMEDIATELE WHEN WE GET POSTS
+    dispatch({ type: START_LOADING });
+    // passed page
+    const { data } = await api.fetchPosts(page);
+    console.log(data);
     dispatch({ type: FETCH_ALL, payload: data });
+    dispatch({ type: END_LOADING });
+  } catch (error) {
+    console.log(error);
+  }
+};
+// For individual posts
+export const getPost = (id) => async (dispatch) => {
+  try {
+    // DISPATCH START LOADING IMMEDIATELE WHEN WE GET POSTS
+    dispatch({ type: START_LOADING });
+    // passed page
+    const { data } = await api.fetchPost(id);
+    console.log(data);
+    dispatch({ type: FETCH_POST, payload: data });
+    dispatch({ type: END_LOADING });
   } catch (error) {
     console.log(error);
   }
@@ -23,6 +45,8 @@ export const getPosts = () => async (dispatch) => {
 // the database with out request
 export const getPostsBySearch = (searchQuery) => async (dispatch) => {
   try {
+    dispatch({ type: START_LOADING });
+
     // Making the request, we have to destructure the {data} becuase we
     // are sending back something called data from the backend
     const {
@@ -30,14 +54,18 @@ export const getPostsBySearch = (searchQuery) => async (dispatch) => {
     } = await api.fetchPostsBySearch(searchQuery);
     console.log(data);
     dispatch({ type: FETCH_BY_SEARCH, payload: data });
+    dispatch({ type: END_LOADING });
+
     // dispatch({ type: FETCH_ALL, payload: data });
   } catch (error) {
     console.log(error);
   }
 };
-export const createPost = (post) => async (dispatch) => {
+export const createPost = (post, history) => async (dispatch) => {
   try {
+    dispatch({ type: START_LOADING });
     const { data } = await api.createPost(post);
+    history.push(`/posts/${data._id}`);
     console.log(data);
     dispatch({ type: CREATE, payload: data });
   } catch {}
@@ -60,8 +88,9 @@ export const deletePost = (id) => async (dispatch) => {
   }
 };
 export const likePost = (id) => async (dispatch) => {
+  const user = JSON.parse(localStorage.getItem("profi"));
   try {
-    const { data } = await api.likePost(id);
+    const { data } = await api.likePost(id, user?.token);
     console.log(data);
     dispatch({ type: LIKE, payload: data });
   } catch {}

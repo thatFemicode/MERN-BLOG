@@ -49,7 +49,7 @@ const Home = () => {
   };
   const handleAdd = (tag) => setTags([...tags, tag]);
   const handleDelete = (tagDelete) =>
-    setTags(tags.filter((tag) => tag === tagDelete));
+    setTags(tags.filter((tag) => tag !== tagDelete));
   // The search post function is to search for posts on
   const searchPost = () => {
     // if there is a search term or there are tags
@@ -59,15 +59,17 @@ const Home = () => {
       // [europe, usa] => "europe,usa"
       dispatch(getPostsBySearch({ search, tags: tags.join(",") }));
       history.push(
-        `/posts/search?searchQuery=${search || "none "}&tags=${tags.join(",")}`
+        `/posts/search?searchQuery=${search || "none"}&tags=${tags.join(",")}`
       );
     } else {
       history.push("/");
     }
   };
-  useEffect(() => {
-    dispatch(getPosts());
-  }, [dispatch, currentId]);
+  // Removed the useeffect firts, it wont be used to load posts from the home page
+  // and pass our page to the pagination as a prop
+  // useEffect(() => {
+  //   dispatch(getPosts());
+  // }, [dispatch, currentId]);
   return (
     <Grow in>
       <Container maxWidth="xl">
@@ -118,9 +120,11 @@ const Home = () => {
               </Button>
             </AppBar>
             <Form currentId={currentId} setCurrentId={setCurrentId} />
-            <Paper elevation={6}>
-              <Paginate />
-            </Paper>
+            {!searchQuery && !tags.length && (
+              <Paper elevation={6}>
+                <Paginate page={page} />
+              </Paper>
+            )}
           </Grid>
         </Grid>
       </Container>

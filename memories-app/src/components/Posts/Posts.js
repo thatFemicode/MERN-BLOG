@@ -5,10 +5,13 @@ import { useSelector } from "react-redux";
 import { Grid, CircularProgress } from "@material-ui/core";
 // using the useSelector will help in getting or fetching the data from global reduc store
 const Posts = ({ setCurrentId }) => {
-  const posts = useSelector((state) => state.posts);
+  const { posts, isLoading } = useSelector((state) => state.posts);
   console.log(posts);
   const classes = useStyles();
-  return !posts.length ? (
+
+  // The code below, we do not have any post and we ar not currently loading
+  if (!posts.length && !isLoading) return "No Post";
+  return isLoading ? (
     <CircularProgress />
   ) : (
     <Grid

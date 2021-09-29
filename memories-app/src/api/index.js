@@ -18,7 +18,8 @@ API.interceptors.request.use((req) => {
   // With this our Backend will be able to get a specific header
 });
 // All actions towrd backend are going to be done with redux
-export const fetchPosts = () => API.get("/posts");
+export const fetchPost = (id) => API.get(`/posts/${id}`);
+export const fetchPosts = (page) => API.get(`/posts?page=${page}`);
 export const fetchPostsBySearch = (searchQuery) =>
   API.get(
     `/posts/search?searchQuery=${searchQuery.search || "none"}&tags=${

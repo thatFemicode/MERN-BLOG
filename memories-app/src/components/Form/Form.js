@@ -5,11 +5,13 @@ import { TextField, Button, Typography, Paper } from "@material-ui/core";
 import FileBase from "react-file-base64";
 import { useDispatch, useSelector } from "react-redux";
 import { createPost, updatePost } from "../../actions/post";
+import { useHistory } from "react-router-dom";
 const Form = ({ currentId, setCurrentId }) => {
+  const history = useHistory();
   // 2nd thing done on this after branch has been pushed to master
   // We only want the data from a post, the updated post so we do the below
   const post = useSelector((state) =>
-    currentId ? state.posts.find((post) => post._id === currentId) : null
+    currentId ? state.posts.posts.find((post) => post._id === currentId) : null
   );
   const user = JSON.parse(localStorage.getItem("profi"));
   const dispatch = useDispatch();
@@ -30,7 +32,8 @@ const Form = ({ currentId, setCurrentId }) => {
     if (currentId) {
       dispatch(updatePost(currentId, { postData, name: user?.result.name }));
     } else {
-      dispatch(createPost({ ...postData, name: user?.result.name }));
+      dispatch(createPost({ ...postData, name: user?.result.name }, history));
+
       // note from the above user will be gotten from local torage
     }
     clear();
