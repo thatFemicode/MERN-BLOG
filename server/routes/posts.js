@@ -8,6 +8,7 @@ const {
   deletePost,
   likePost,
   getPost,
+  commentPost,
 } = require('../controllers/posts');
 const { auth } = require('../middleware/auth');
 router.get('/search', getPostsBySearch);
@@ -17,6 +18,7 @@ router.post('/', auth, createPost);
 router.patch('/:id', auth, updatePost);
 router.delete('/:id', auth, deletePost);
 router.patch('/:id/LikePost', auth, likePost);
+router.post('/:id/commentPost', auth, commentPost);
 module.exports = router;
 
 // Now you can only update and delete only post that you created

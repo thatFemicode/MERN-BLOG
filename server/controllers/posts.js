@@ -135,6 +135,19 @@ const likePost = async (req, res) => {
   });
   res.json(updatedPost);
 };
+const commentPost = async (req, res) => {
+  // we are going to get few values from the frontend
+  // the value
+  const { id } = req.params;
+  const { value } = req.body;
+  const post = await PostMessage.findById(id);
+  post.comments.push(value);
+
+  const updatedPost = await PostMessage.findByIdAndUpdate(id, post, {
+    new: true,
+  });
+  res.json(updatedPost);
+};
 module.exports = {
   getPosts,
   getPostsBySearch,
@@ -143,4 +156,5 @@ module.exports = {
   deletePost,
   likePost,
   getPost,
+  commentPost,
 };

@@ -9,6 +9,7 @@ import {
   START_LOADING,
   END_LOADING,
   FETCH_POST,
+  COMMENT,
 } from "../constants/actionTypes";
 // Now we have to create actions
 // actiona cretors are functions that return actions
@@ -94,6 +95,16 @@ export const likePost = (id) => async (dispatch) => {
     console.log(data);
     dispatch({ type: LIKE, payload: data });
   } catch {}
+};
+export const commentPost = (value, id) => async (dispatch) => {
+  // value and id are coming from the commentsection dispatch
+  try {
+    const { data } = await api.comment(value, id);
+    console.log(data);
+    dispatch({ type: COMMENT, payload: data });
+    // After we dispatch this action, we also have to return the newswt comment coming in
+    return data.comments;
+  } catch (error) {}
 };
 // payload is usually the data where we store all of our post
 // When you are deleting something payload should be the id that is to be deleted

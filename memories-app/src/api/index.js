@@ -36,6 +36,8 @@ export const updatePost = (id, updatedPost) =>
 
 export const deletePost = (id) => API.delete(`/posts/${id}`, deletePost);
 export const likePost = (id) => API.patch(`/posts/${id}/likePost`);
+export const comment = (value, id) =>
+  API.post(`/posts/${id}/commentPost`, { value });
 
 // Route for SIGNIN AND SIGNOUT
 export const signIn = (formData) => API.post("/user/signin", formData);
